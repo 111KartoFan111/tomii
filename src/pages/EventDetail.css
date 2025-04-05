@@ -1,3 +1,4 @@
+/* EventDetail.css */
 .event-page {
   margin-bottom: 60px;
 }
@@ -28,8 +29,6 @@
 .event-header-content h1 {
   font-size: 42px;
   margin-bottom: 5px;
-  text-align: center;
-
   font-weight: bold;
 }
 
@@ -37,7 +36,6 @@
   font-size: 24px;
   font-weight: normal;
   opacity: 0.9;
-  text-align: center;
   margin-top: 0;
 }
 
@@ -337,15 +335,6 @@
   border-color: #8e44ad;
 }
 
-.pay-button.disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
-}
-
-.pay-button.disabled:hover {
-  background-color: #95a5a6;
-}
-
 .booking-notice {
   background-color: #f8f4ff;
   border-left: 4px solid #8e44ad;
@@ -382,6 +371,15 @@
   background-color: #c0392b;
 }
 
+.pay-button.disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.pay-button.disabled:hover {
+  background-color: #95a5a6;
+}
+
 .cancel-button {
   padding: 12px 25px;
   background-color: #f7f7f7;
@@ -396,6 +394,202 @@
 
 .cancel-button:hover {
   background-color: #eee;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 18px;
+  color: #777;
+}
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.payment-modal {
+  background-color: white;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modal-appear 0.3s ease-out;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #8e44ad;
+  color: white;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-content {
+  padding: 20px;
+}
+
+.payment-info {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.input-prefix {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-right: none;
+  padding: 10px 15px;
+  border-radius: 5px 0 0 5px;
+  color: #333;
+  font-weight: bold;
+}
+
+.kaspi-input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 0 5px 5px 0;
+  font-size: 16px;
+}
+
+.kaspi-input:focus {
+  outline: none;
+  border-color: #8e44ad;
+}
+
+.input-error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.selected-event-info {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+.selected-event-info p {
+  margin: 5px 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.send-payment-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.send-payment-button:hover {
+  background-color: #c0392b;
+}
+
+/* Стили для экрана успешной отправки */
+.payment-success {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  background-color: #2ecc71;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin: 0 auto 20px;
+}
+
+.success-note {
+  color: #8e44ad;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.close-success-button {
+  background-color: #8e44ad;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.close-success-button:hover {
+  background-color: #7d3c98;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+  .seating-layout {
+    flex-direction: column;
+  }
+  
+  .selected-seats-summary {
+    margin-top: 20px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -424,7 +618,52 @@
     flex-direction: column;
   }
   
-  .seating-chart {
+  .payment-modal {
+    width: 95%;
+  }
+  
+  .modal-header {
+    padding: 10px 15px;
+  }
+  
+  .modal-content {
     padding: 15px;
   }
+  
+  .seating-legend {
+    justify-content: center;
+  }
+}
+.seat.booked {
+  background-color: #95a5a6 !important; /* Серый цвет для забронированных мест */
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Обновить стили для легенды */
+.seating-legend {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 10px;
+  margin-bottom: 8px;
+}
+
+.legend-color {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.legend-color.selected {
+  background-color: #e74c3c;
 }

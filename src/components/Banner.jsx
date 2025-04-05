@@ -18,7 +18,7 @@ function Banner() {
         loop={true}
       >
         <SwiperSlide>
-          <div className="banner-slide" style={{ backgroundImage: "url('/images/concert-blue.jpg')" }}>
+          <div className="banner-slide" style={{ backgroundImage: "url('/images/concert-blue.png')" }}>
             <div className="banner-content">
               <h1>LiveWave</h1>
               <p>Покупай билеты с нами!</p>
@@ -26,7 +26,7 @@ function Banner() {
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="banner-slide" style={{ backgroundImage: "url('/images/concert-alt.jpg')" }}>
+          <div className="banner-slide" style={{ backgroundImage: "url('/images/exoplanet.jpg')" }}>
             <div className="banner-content">
               <h1>Все концерты</h1>
               <p>В одном месте</p>

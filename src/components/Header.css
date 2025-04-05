@@ -15,10 +15,11 @@
   .logo-text {
     font-size: 24px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
   }
   
   .logo-lw {
-    background-color: #8e44ad;
     color: white;
     padding: 3px 8px;
     border-radius: 5px;

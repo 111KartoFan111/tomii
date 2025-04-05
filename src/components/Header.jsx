@@ -6,7 +6,8 @@ function Header() {
     <header className="header">
       <div className="logo">
         <span className="logo-text">
-          <span className="logo-lw">LW</span> LiveWave
+          <img src="/images/logo.svg" alt="LiveWave" className="logo-lw" />
+          <span className="logo-name">LiveWave</span>
         </span>
       </div>
       <nav className="navigation">

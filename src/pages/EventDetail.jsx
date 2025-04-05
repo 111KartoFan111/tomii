@@ -11,6 +11,13 @@ function EventDetail() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [ticketType, setTicketType] = useState('standard');
+  const [bookedSeats, setBookedSeats] = useState([]); // Отдельный массив для забронированных мест
+  
+  // Состояния для модального окна оплаты
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [kaspiNumber, setKaspiNumber] = useState('');
+  const [paymentSent, setPaymentSent] = useState(false);
+  const [inputError, setInputError] = useState('');
   
   useEffect(() => {
     // Загружаем данные о мероприятии при монтировании компонента
@@ -19,11 +26,26 @@ function EventDetail() {
     if (eventData) {
       setEvent(eventData);
       setLoading(false);
+      
+      // Инициализируем массив недоступных мест
+      if (eventData.venue && eventData.venue.unavailableSeats) {
+        const unavailableSeatsArray = eventData.venue.unavailableSeats.map(
+          item => `${item.row}-${item.seat}`
+        );
+        setBookedSeats(unavailableSeatsArray);
+      }
     } else {
       // Если мероприятие не найдено, перенаправляем на страницу афиши
       navigate('/afisha');
     }
   }, [id, navigate]);
+  
+  // Если оплата отправлена, но модальное окно закрыто, обновляем UI
+  useEffect(() => {
+    if (paymentSent && !showPaymentModal) {
+      setSelectedSeats([]);
+    }
+  }, [paymentSent, showPaymentModal]);
   
   if (loading || !event) {
     return <div className="loading">Загрузка...</div>;
@@ -41,7 +63,15 @@ function EventDetail() {
   
   // Проверяем, доступно ли место
   const isSeatAvailable = (row, seat) => {
-    return EventService.isSeatAvailable(event.id, row, seat);
+    // Проверяем по локальному массиву забронированных мест
+    return !bookedSeats.includes(`${row}-${seat}`);
+  };
+  
+  // Проверяем, забронировано ли место после оплаты
+  const isBooked = (row, seat) => {
+    // Проверяем только недоступные места, исключая выбранные
+    return bookedSeats.includes(`${row}-${seat}`) && 
+           !selectedSeats.some(s => s.id === `${row}-${seat}`);
   };
   
   // Получаем цвет для категории места
@@ -89,6 +119,79 @@ function EventDetail() {
   
   const getTotalPrice = () => {
     return selectedSeats.reduce((total, seat) => total + seat.price, 0);
+  };
+  
+  // Функция для отмены выбора всех мест
+  const handleCancelSelection = () => {
+    setSelectedSeats([]);
+  };
+  
+  // Обработчики для модального окна оплаты
+  const openPaymentModal = () => {
+    setShowPaymentModal(true);
+    setPaymentSent(false);
+    setKaspiNumber('');
+    setInputError('');
+  };
+  
+  const closePaymentModal = () => {
+    setShowPaymentModal(false);
+  };
+  
+  const handleKaspiNumberChange = (e) => {
+    const value = e.target.value;
+    // Проверяем, что вводятся только цифры
+    if (value === '' || /^[0-9]+$/.test(value)) {
+      setKaspiNumber(value);
+      setInputError('');
+    }
+  };
+  
+  const sendPaymentRequest = () => {
+    // Проверка валидности номера Kaspi
+    if (!kaspiNumber || kaspiNumber.length !== 10) {
+      setInputError('Введите корректный номер телефона (10 цифр)');
+      return;
+    }
+    
+    // Симуляция отправки платежа
+    setTimeout(() => {
+      // Создаем новый массив забронированных мест, добавляя выбранные
+      const newBookedSeats = [...bookedSeats];
+      
+      // Добавляем выбранные места в список забронированных
+      selectedSeats.forEach(seat => {
+        if (!newBookedSeats.includes(seat.id)) {
+          newBookedSeats.push(seat.id);
+        }
+      });
+      
+      // Обновляем список забронированных мест
+      setBookedSeats(newBookedSeats);
+      
+      // Обновляем данные события для сохранения изменений
+      const updatedUnavailableSeats = [...event.venue.unavailableSeats];
+      
+      // Добавляем выбранные места в массив недоступных мест событий
+      selectedSeats.forEach(seat => {
+        updatedUnavailableSeats.push({
+          row: seat.row,
+          seat: seat.seat
+        });
+      });
+      
+      // Обновляем данные события
+      const updatedEvent = {
+        ...event,
+        venue: {
+          ...event.venue,
+          unavailableSeats: updatedUnavailableSeats
+        }
+      };
+      
+      setEvent(updatedEvent);
+      setPaymentSent(true);
+    }, 1000);
   };
 
   return (
@@ -178,6 +281,10 @@ function EventDetail() {
                     <div className="legend-color selected"></div>
                     <span>Выбранные места</span>
                   </div>
+                  <div className="legend-item">
+                    <div className="legend-color" style={{ backgroundColor: '#95a5a6' }}></div>
+                    <span>Занятые места</span>
+                  </div>
                 </div>
                 <div className="seating-layout">
                   <div className="hall-schema">
@@ -192,17 +299,26 @@ function EventDetail() {
                             <div className="row-number">{row}</div>
                             {[...Array(seatsInRow)].map((_, seatIndex) => {
                               const seat = seatIndex + 1;
-                              const isAvailable = isSeatAvailable(row, seat);
-                              const isSelected = selectedSeats.some(s => s.id === `${row}-${seat}`);
+                              const available = isSeatAvailable(row, seat);
+                              const selected = selectedSeats.some(s => s.id === `${row}-${seat}`);
+                              const booked = isBooked(row, seat);
+                              
+                              let backgroundColor;
+                              if (selected) {
+                                backgroundColor = '#e74c3c'; // красный для выбранных
+                              } else if (booked) {
+                                backgroundColor = '#95a5a6'; // серый для забронированных
+                              } else if (!available) {
+                                backgroundColor = '#95a5a6'; // серый для недоступных
+                              } else {
+                                backgroundColor = getCategoryColor(row); // цвет категории для доступных
+                              }
+                              
                               return (
                                 <div
                                   key={seat}
-                                  className={`seat ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected' : ''}`}
-                                  style={{
-                                    backgroundColor: isSelected ? '#e74c3c' :
-                                                    !isAvailable ? '#95a5a6' :
-                                                    getCategoryColor(row)
-                                  }}
+                                  className={`seat ${available ? 'available' : 'unavailable'} ${selected ? 'selected' : ''} ${booked ? 'booked' : ''}`}
+                                  style={{ backgroundColor }}
                                   onClick={() => handleSeatClick(row, seat)}
                                 />
                               );
@@ -249,16 +365,75 @@ function EventDetail() {
                   <button
                     className={`pay-button ${selectedSeats.length === 0 ? 'disabled' : ''}`}
                     disabled={selectedSeats.length === 0}
+                    onClick={openPaymentModal}
                   >
                     Оплатить билет
                   </button>
-                  <button className="cancel-button">Отменить</button>
+                  <button 
+                    className="cancel-button"
+                    onClick={handleCancelSelection}
+                  >
+                    Отменить
+                  </button>
                 </div>
               </>
             )}
           </div>
         </div>
       </div>
+      
+      {/* Модальное окно оплаты */}
+      {showPaymentModal && (
+        <div className="modal-overlay">
+          <div className="payment-modal">
+            <div className="modal-header">
+              <h3>{paymentSent ? 'Оплата отправлена' : 'Оплата билета'}</h3>
+              <button className="close-modal" onClick={closePaymentModal}>&times;</button>
+            </div>
+            
+            <div className="modal-content">
+              {!paymentSent ? (
+                <>
+                  <div className="payment-info">
+                    <p>Для оплаты билетов на сумму <strong>{getTotalPrice()} тг</strong> введите номер телефона Kaspi:</p>
+                    <div className="input-group">
+                      <div className="input-prefix">+7</div>
+                      <input 
+                        type="text" 
+                        className="kaspi-input"
+                        placeholder="7XX XXX XXXX" 
+                        value={kaspiNumber} 
+                        onChange={handleKaspiNumberChange}
+                        maxLength={10}
+                      />
+                    </div>
+                    {inputError && <div className="input-error">{inputError}</div>}
+                    <div className="selected-event-info">
+                      <p><strong>{event.title}</strong> - {event.dates.find(d => d.id === selectedDate)?.date}</p>
+                      <p>Выбрано мест: {selectedSeats.length}</p>
+                    </div>
+                  </div>
+                  <div className="modal-actions">
+                    <button className="send-payment-button" onClick={sendPaymentRequest}>
+                      Отправить счет
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="payment-success">
+                  <div className="success-icon">✓</div>
+                  <p>Счет на оплату отправлен на ваш указанный номер.</p>
+                  <p>После оплаты билет придет в виде СМС.</p>
+                  <p className="success-note">Выбранные места забронированы за вами на 30 минут.</p>
+                  <button className="close-success-button" onClick={closePaymentModal}>
+                    Закрыть
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

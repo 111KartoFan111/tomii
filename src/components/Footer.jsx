@@ -6,7 +6,8 @@ function Footer() {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-logo">
-          <span className="logo-lw">LW</span> LiveWave
+          <img src="/images/logo.svg" alt="LiveWave" className="logo-lw" />
+          <span className="logo-name">LiveWave</span>
         </div>
         <div className="footer-info">
           <p>тел: 8123456789</p>
