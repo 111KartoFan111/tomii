@@ -1,26 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
+import EventService from '../services/EventService';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './FeaturedEvent.css';
 
 function FeaturedEvent() {
-  const featuredEvents = [
-    {
-      id: 1,
-      title: 'NCT 127 TOUR',
-      subtitle: 'С кэшбеком 20%!',
-      image: '/images/nct127-featured.jpg',
-    },
-    {
-      id: 2,
-      title: 'EXO PLANET',
-      subtitle: 'Специальные места',
-      image: '/images/exoplanet-featured.jpg',
-    },
-  ];
+  const [events, setEvents] = useState([]);
+  
+  useEffect(() => {
+    const featuredEvents = EventService.getFeaturedEvents();
+    setEvents(featuredEvents);
+  }, []);
 
   return (
     <section className="featured-event">
@@ -33,13 +27,15 @@ function FeaturedEvent() {
         pagination={{ clickable: true }}
         loop={true}
       >
-        {featuredEvents.map(event => (
+        {events.map(event => (
           <SwiperSlide key={event.id}>
-            <div className="featured-slide" style={{ backgroundImage: `url(${event.image})` }}>
+            <div className="featured-slide" style={{ backgroundImage: `url(${event.image.detail})` }}>
               <div className="featured-content">
                 <h3>{event.title}</h3>
                 <p>{event.subtitle}</p>
-                <button className="buy-ticket-btn">Купить билет</button>
+                <Link to={`/event/${event.id}`}>
+                  <button className="buy-ticket-btn">Купить билет</button>
+                </Link>
               </div>
             </div>
           </SwiperSlide>

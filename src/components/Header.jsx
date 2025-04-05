@@ -13,7 +13,6 @@ function Header() {
         <ul>
           <li><a href="/" className="active">Главная</a></li>
           <li><a href="/afisha">Афиша</a></li>
-          <li><a href="/login">Войти</a></li>
         </ul>
       </nav>
       <div className="search">

@@ -1,24 +1,27 @@
 import React from 'react';
-import Header from './components/Header.jsx';
-import Banner from './components/Banner.jsx';
-import PopularEvents from './components/PopularEvents';
-import FeaturedEvent from './components/FeaturedEvent';
-import EventsList from './components/EventsList';
-import Footer from './components/Footer.jsx';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import Afisha from './pages/Afisha';
+import EventDetail from './pages/EventDetail';
 import './App.css';
 
 function App() {
   return (
-    <div className="app">
-      <Header />
-      <Banner />
-      <div className="container">
-        <PopularEvents />
-        <FeaturedEvent />
-        <EventsList />
+    <Router>
+      <div className="app">
+        <Header />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/afisha" element={<Afisha />} />
+            <Route path="/event/:id" element={<EventDetail />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </Router>
   );
 }
 

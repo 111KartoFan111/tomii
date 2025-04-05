@@ -1,41 +1,38 @@
-import React from 'react';
-import EventCard from './EventCard.jsx';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import EventCard from './EventCard';
+import EventService from '../services/EventService';
 import './EventsList.css';
 
-function EventsList() {
-  const events = [
-    {
-      id: 1,
-      title: 'NCT 127 TOUR',
-      date: '24 мая, 18:30',
-      location: 'Барыс Арена',
-      image: '/images/nct127.jpg'
-    },
-    {
-      id: 2,
-      title: 'EXO PLANET',
-      date: '15 янв, 17:00',
-      location: 'Барыс Арена',
-      image: '/images/exoplanet.jpg'
-    },
-    {
-      id: 3,
-      title: 'EXO PLANET',
-      date: '15 янв, 17:00',
-      location: 'Барыс Арена',
-      image: '/images/exoplanet.jpg'
-    },
-  ];
+function EventsList({ limit = 3 }) {
+  const [events, setEvents] = useState([]);
+  
+  useEffect(() => {
+    // Получаем ближайшие события при монтировании компонента
+    const upcomingEvents = EventService.getUpcomingEvents(limit);
+    setEvents(upcomingEvents);
+  }, [limit]);
 
   return (
     <section className="events-list">
       <div className="events-header">
         <h2>Афиша событий</h2>
-        <a href="/all-events" className="see-all">Показать все</a>
+        <Link to="/afisha" className="see-all">Показать все</Link>
       </div>
       <div className="events-grid">
         {events.map(event => (
-          <EventCard key={event.id} event={event} />
+          <Link to={`/event/${event.id}`} key={event.id} className="event-link">
+            <EventCard 
+              title={event.title}
+              subtitle={event.subtitle}
+              date={event.dates[0].date}
+              time={event.dates[0].time}
+              location={event.location.name}
+              image={event.image.card}
+              price={event.priceDisplay}
+              restriction={event.restriction}
+            />
+          </Link>
         ))}
       </div>
     </section>
